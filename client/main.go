@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
 
@@ -15,11 +16,16 @@ const (
 
 func main() {
 	// Устанавливаем соединение с gRPC сервером
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.NewClient(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
+	defer func(conn *grpc.ClientConn) {
+		err := conn.Close()
+		if err != nil {
+
+		}
+	}(conn)
 	client := pb.NewGreeterClient(conn)
 
 	// Создаем контекст с таймаутом
